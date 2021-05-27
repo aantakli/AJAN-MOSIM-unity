@@ -41,12 +41,13 @@ public class AJANAgent : MonoBehaviour
     public int AgentCLPort = 8083;
     public string Repository = "http://localhost:8090/rdf4j/repositories/agents";
     public bool Report = false;
+    public bool Docker = false;
 
     private string AJANTemplate;
     public string AJANExecute;
     private MMIAvatar mmiAvatar;
 
-
+    private string dockerHost = "host.docker.internal";
     public int index = 0;
     public List<string> list = new List<string>();
     public Dictionary<string, string> templateList = new Dictionary<string, string>();
@@ -169,7 +170,9 @@ public class AJANAgent : MonoBehaviour
     {
         string scene = "_:scene";
         graph.Append(scene + " " + "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>" + " " + "<http://www.dfki.de/mosim-ns#Scene>" + ".");
-        graph.Append(scene + " " + "<http://www.dfki.de/mosim-ns#host>" + " '" + mmiSettings.RemoteSceneAccessAddress + "'^^<http://www.w3.org/2001/XMLSchema#string>" + ".");
+        if (Docker && (mmiSettings.RemoteSceneAccessAddress == "localhost" || mmiSettings.RemoteSceneAccessAddress == "127.0.0.1"))
+            graph.Append(scene + " " + "<http://www.dfki.de/mosim-ns#host>" + " '" + dockerHost + "'^^<http://www.w3.org/2001/XMLSchema#string>" + ".");
+        else graph.Append(scene + " " + "<http://www.dfki.de/mosim-ns#host>" + " '" + mmiSettings.RemoteSceneAccessAddress + "'^^<http://www.w3.org/2001/XMLSchema#string>" + ".");
         graph.Append(scene + " " + "<http://www.dfki.de/mosim-ns#port>" + " '" + mmiSettings.RemoteSceneAccessPort + "'^^<http://www.w3.org/2001/XMLSchema#string>" + ".");
     }
 
@@ -177,23 +180,29 @@ public class AJANAgent : MonoBehaviour
     {
         string scene = "_:sceneWrite";
         graph.Append(scene + " " + "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>" + " " + "<http://www.dfki.de/mosim-ns#SceneWrite>" + ".");
-        graph.Append(scene + " " + "<http://www.dfki.de/mosim-ns#host>" + " '" + mmiSettings.RemoteSceneWriteAddress + "'^^<http://www.w3.org/2001/XMLSchema#string>" + ".");
+        if (Docker && (mmiSettings.RemoteSceneWriteAddress == "localhost" || mmiSettings.RemoteSceneWriteAddress == "127.0.0.1"))
+            graph.Append(scene + " " + "<http://www.dfki.de/mosim-ns#host>" + " '" + dockerHost + "'^^<http://www.w3.org/2001/XMLSchema#string>" + ".");
+        else graph.Append(scene + " " + "<http://www.dfki.de/mosim-ns#host>" + " '" + mmiSettings.RemoteSceneWriteAddress + "'^^<http://www.w3.org/2001/XMLSchema#string>" + ".");
         graph.Append(scene + " " + "<http://www.dfki.de/mosim-ns#port>" + " '" + mmiSettings.RemoteSceneWritePort + "'^^<http://www.w3.org/2001/XMLSchema#string>" + ".");
     }
 
     private void setSkeletonInfos(StringBuilder graph)
     {
-        string scene = "_:skeleton";
-        graph.Append(scene + " " + "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>" + " " + "<http://www.dfki.de/mosim-ns#SkeletonAccess>" + ".");
-        graph.Append(scene + " " + "<http://www.dfki.de/mosim-ns#host>" + " '" + mmiSettings.RemoteSkeletonAccessAddress + "'^^<http://www.w3.org/2001/XMLSchema#string>" + ".");
-        graph.Append(scene + " " + "<http://www.dfki.de/mosim-ns#port>" + " '" + mmiSettings.RemoteSkeletonAccessPort + "'^^<http://www.w3.org/2001/XMLSchema#string>" + ".");
+        string skeleton = "_:skeleton";
+        graph.Append(skeleton + " " + "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>" + " " + "<http://www.dfki.de/mosim-ns#SkeletonAccess>" + ".");
+        if (Docker && (mmiSettings.RemoteSkeletonAccessAddress == "localhost" || mmiSettings.RemoteSkeletonAccessAddress == "127.0.0.1"))
+            graph.Append(skeleton + " " + "<http://www.dfki.de/mosim-ns#host>" + " '" + dockerHost + "'^^<http://www.w3.org/2001/XMLSchema#string>" + ".");
+        else graph.Append(skeleton + " " + "<http://www.dfki.de/mosim-ns#host>" + " '" + mmiSettings.RemoteSkeletonAccessAddress + "'^^<http://www.w3.org/2001/XMLSchema#string>" + ".");
+        graph.Append(skeleton + " " + "<http://www.dfki.de/mosim-ns#port>" + " '" + mmiSettings.RemoteSkeletonAccessPort + "'^^<http://www.w3.org/2001/XMLSchema#string>" + ".");
     }
 
     private void setRegistryInfos(StringBuilder graph)
     {
         string registry = "_:registry";
         graph.Append(registry + " " + "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>" + " " + "<http://www.dfki.de/mosim-ns#Registry>" + ".");
-        graph.Append(registry + " " + "<http://www.dfki.de/mosim-ns#host>" + " '" + mmiSettings.MMIRegisterAddress + "'^^<http://www.w3.org/2001/XMLSchema#string>" + ".");
+        if (Docker && (mmiSettings.MMIRegisterAddress == "localhost" || mmiSettings.MMIRegisterAddress == "127.0.0.1"))
+            graph.Append(registry + " " + "<http://www.dfki.de/mosim-ns#host>" + " '" + dockerHost + "'^^<http://www.w3.org/2001/XMLSchema#string>" + ".");
+        else graph.Append(registry + " " + "<http://www.dfki.de/mosim-ns#host>" + " '" + mmiSettings.MMIRegisterAddress + "'^^<http://www.w3.org/2001/XMLSchema#string>" + ".");
         graph.Append(registry + " " + "<http://www.dfki.de/mosim-ns#port>" + " '" + mmiSettings.MMIRegisterPort + "'^^<http://www.w3.org/2001/XMLSchema#string>" + ".");
     }
 
@@ -201,7 +210,9 @@ public class AJANAgent : MonoBehaviour
     {
         string cosim = "_:cosim";
         graph.Append(cosim + " " + "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>" + " " + "<http://www.dfki.de/mosim-ns#CoSimulator>" + ".");
-        graph.Append(cosim + " " + "<http://www.dfki.de/mosim-ns#host>" + " '" + mmiAvatar.RemoteCoSimulationAccessAddress + "'^^<http://www.w3.org/2001/XMLSchema#string>" + ".");
+        if (Docker && (mmiAvatar.RemoteCoSimulationAccessAddress == "localhost" || mmiAvatar.RemoteCoSimulationAccessAddress == "127.0.0.1"))
+            graph.Append(cosim + " " + "<http://www.dfki.de/mosim-ns#host>" + " '" + dockerHost + "'^^<http://www.w3.org/2001/XMLSchema#string>" + ".");
+        else graph.Append(cosim + " " + "<http://www.dfki.de/mosim-ns#host>" + " '" + mmiAvatar.RemoteCoSimulationAccessAddress + "'^^<http://www.w3.org/2001/XMLSchema#string>" + ".");
         graph.Append(cosim + " " + "<http://www.dfki.de/mosim-ns#port>" + " '" + mmiAvatar.RemoteCoSimulationAccessPort + "'^^<http://www.w3.org/2001/XMLSchema#string>" + ".");
     }
 

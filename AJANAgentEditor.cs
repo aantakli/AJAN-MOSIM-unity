@@ -46,6 +46,11 @@ public class AJANAgentEditor : Editor
             agent.Report = true;
         else agent.Report = false;
 
+        var toggleDocker = EditorGUILayout.Toggle("Docker", agent.Docker);
+        if (toggleDocker)
+            agent.Docker = true;
+        else agent.Docker = false;
+
         if (GUILayout.Button("Get Available Agent Templates"))
         {
             agent.Load();
